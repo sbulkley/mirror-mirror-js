@@ -102,6 +102,16 @@
                 
                 var audio = $("audio");
                 
+                $(".nav-item").click(function() {
+                    var me = $(this);
+                    me.css("background-color", "#fff");
+                    console.log(me);
+                     setTimeout(function() {
+                         console.log(me);
+                        me.css("background-color", "rgba(0,0,0,0)");
+                    }, 100, me);
+                });
+                
                 $("#nav-traffic").click(function() {
                     if(mapShown === false) {
                         mapShown = true;
