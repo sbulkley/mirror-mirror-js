@@ -13,12 +13,10 @@ function startTime() {
   }
     
   var m = today.getMinutes();
-  var s = today.getSeconds();
-  
+    
   m = checkTime(m);
-  s = checkTime(s);
-
-  $('#clock').html(h + ":" + m + ":" + s + half);
+    
+  $('#clock').html(h + ":" + m + half);
     
   var t = setTimeout(function() {
       startTime()

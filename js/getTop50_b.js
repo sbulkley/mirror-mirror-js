@@ -23312,6 +23312,7 @@ function getUrlById(id) {
                 url: url,
                 type: 'GET',
                 success: function(data) {
+                    //console.log(id + ": " + data.url);
                     pop50[id].url = data.url; 
                 }
             });
