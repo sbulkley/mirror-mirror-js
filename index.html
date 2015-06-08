@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>~WTHR</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="css/icons/icons.css">
+        <link rel="stylesheet" href="css/animate.css">
+        <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
+    </head>
+    <body>
+        <div id="nav">
+            <div class="nav-item" id="nav-weather">WEATHER</div>
+            <div class="nav-item" id="nav-traffic">TRAFFIC</div>
+            <div class="nav-item" id="nav-news">NEWS</div>
+            <div class="nav-item" id="nav-music">MUSIC</div>
+            <div class="nav-item right" id="nav-stop">STOP</div>
+            <div class="nav-item right" id="nav-play">
+                <span id="play-text">PLAY</span>
+                <img id="audio" src="img/sound.gif">
+                <img id="loading" src="img/loading.gif">
+            </div>
+            <div class="nav-item right" id="nav-up">UP</div>
+            <div class="nav-item right" id="nav-down">DOWN</div>
+        </div>
+        <div id="control-holder">
+            <audio id="sound" src="" controls></audio>
+        </div>
+        <div id="forecast-container">
+            <ul id="forecast"></ul>
+        </div>
+        <div id="tracks-container">
+            <ul id="tracks"></ul>
+        </div>
+        <div id="clock"></div>
+        <div id="news"></div>
+        <div id="map-container">
+            <iframe id="map" src="https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d86050.15024094965!2d-122.42150085557832!3d47.624825074543054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e6!4m5!1s0x5490169429d20749%3A0x9f7fe4b733ac165!2s10326+15th+Ave+NW%2C+Seattle%2C+WA+98177!3m2!1d47.704361!2d-122.376086!4m5!1s0x54904195b6e5e62f%3A0xc742843a7702fe79!2sPacific+Market+Center%2C+4th+Avenue+South%2C+Seattle%2C+WA!3m2!1d47.547139!2d-122.32909!5e0!3m2!1sen!2sus!4v1433222675421"></iframe>
+        </div>
+        <script>
+            var weather = [];
+            var pop50ids = [];
+            var hasTrack = [];
+            var pop50 = {};
+        </script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="js/animateback.js"></script>
+        <script src="js/weather_b.js"></script>
+        <script src="js/news_b.js"></script>
+        <script src="js/clock.js"></script>
+        <script src="js/getTop50_b.js"></script>
+        <script>
+            var mapShown = false;
+            var weatherShown = true;
+            var musicShown = false;
+            var newsShown = true;
+            var activeTrack = 0;
+            var firstClick = true;
+            var allowPlaylist = false;
+            
+            function updateTrack() {
+                var all = $(".track");
+                for(var x = 0; x < 50; x++) {
+                    $($(all[x])).css('border', 'none');
+                }
+                $($("#tracks").children()[activeTrack]).children().css('border', '1px solid #fff');
+            }
+            
+            function playByUrl() {
+                $("#sound").attr("src", pop50[pop50ids[activeTrack]].url);
+                document.getElementById("sound").play();
+            }   
+            
+            $(document).ready(function() {   
+                
+                var audio = $("audio");
+                
+                $("#nav-traffic").click(function() {
+                    if(mapShown === false) {
+                        mapShown = true;
+                        $("#map-container").fadeIn();
+                    } else {
+                        mapShown = false;
+                        $("#map-container").fadeOut();
+                    }
+                });
+                
+                $("#map-container").click(function() {
+                    if(mapShown === true) {
+                        mapShown = false;
+                        $("#map-container").fadeOut();
+                    }
+                });
+                
+                $("#nav-weather").click(function() {
+                    if(weatherShown === false) {
+                        $("#forecast-container").animateCSS('slideInLeft', function() {
+                            weatherShown = true;
+                        });
+                    } else {
+                        $("#forecast-container").animateCSS('slideOutLeft', function() {
+                            $("#forecast-container").hide();
+                            weatherShown = false;
+                        });
+                    }
+                });
+                
+                $("#nav-music").click(function() {
+                    if(firstClick) {
+                        updateTrack();
+                        firstClick = false;
+                    }
+                    if(musicShown === false) {
+                        $("#tracks-container").animateCSS('slideInRight', function() {
+                            musicShown = true;
+                        });
+                    } else {
+                        $("#tracks-container").animateCSS('slideOutRight', function() {
+                            $("#tracks-container").hide();
+                            musicShown = false;
+                        });
+                    }
+                });
+                
+                $("#nav-news").click(function() {
+                    if(newsShown === true) {
+                        $("#news").css('opacity', '0');
+                        newsShown = false;
+                    } else {
+                        $("#news").css('opacity', '1');
+                        newsShown = true;
+                    }
+                });
+                    
+                
+                $("#nav-down").click(function() {
+                    if(activeTrack === 49) {
+                        activeTrack = 0;
+                    } else {
+                        activeTrack += 1;
+                    }
+
+                    updateTrack();
+                });
+                
+                $("#nav-up").click(function() {
+                    if(activeTrack === 0) {
+                        activeTrack = 49;
+                    } else {
+                        activeTrack -= 1;
+                    }
+                    
+                    updateTrack();
+                });
+                
+                $("#nav-play").click(function() {
+                    if(musicShown === true) {
+                        allowPlaylist = true;
+                        $("#play-text").hide();
+                        $("#audio").show();
+                        playByUrl();
+                    } else {
+                        if(firstClick) {
+                            updateTrack();
+                            firstClick = false;
+                        }
+                        $("#tracks-container").animateCSS('slideInRight', function() {
+                            musicShown = true;
+                        });
+                    }
+                        
+                });
+                
+                $("audio").on("ended", function() {
+                    if(activeTrack !== 49) {
+                        activeTrack += 1;
+                        updateTrack();
+                        playByUrl();
+                    } else {
+                        $("#audio").hide();
+                        $("#play-text").show();
+                        activeTrack = 0;
+                        updateTrack();
+                    }
+                });
+                
+                $("#nav-stop").click(function() {
+                    allowPlaylist = false;
+                    document.getElementById("sound").pause();
+                    $("#audio").hide();
+                    $("#play-text").show();
+                });
+            });
+                
+        </script>
+    </body>
+</html>
