@@ -45,6 +45,7 @@
             var pop50ids = [];
             var hasTrack = [];
             var pop50 = {};
+            var newsTitles = [];
         </script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
         <script src="js/animateback.js"></script>
@@ -58,6 +59,7 @@
             var musicShown = false;
             var newsShown = true;
             var activeTrack = 0;
+            var trackPlaying = -1;
             var firstClick = true;
             var allowPlaylist = false;
             
@@ -70,9 +72,31 @@
             }
             
             function playByUrl() {
+                //console.log(pop50ids[activeTrack]);
+                trackPlaying = activeTrack;
                 $("#sound").attr("src", pop50[pop50ids[activeTrack]].url);
                 document.getElementById("sound").play();
-            }   
+            }
+            
+            function scroller(i) {
+                if(newsShown) {
+                    if (i === 14) {
+                        i = 0;
+                    }
+
+                    $("#news").animateCSS('slideOutDown', function() {
+                        $("#news").hide();
+                        $("#news").html(newsTitles[i])
+                        $("#news").animateCSS('slideInUp');
+                    });
+
+                    i++;
+
+                    var t = setTimeout(function() {
+                        scroller(i)
+                    }, 5000);
+                }
+            }
             
             $(document).ready(function() {   
                 
@@ -127,11 +151,12 @@
                 
                 $("#nav-news").click(function() {
                     if(newsShown === true) {
-                        $("#news").css('opacity', '0');
+                        $("#news").css('opacity', 0);
                         newsShown = false;
                     } else {
-                        $("#news").css('opacity', '1');
                         newsShown = true;
+                        $("#news").css('opacity', 1);
+                        scroller(0);
                     }
                 });
                     
@@ -158,10 +183,22 @@
                 
                 $("#nav-play").click(function() {
                     if(musicShown === true) {
-                        allowPlaylist = true;
-                        $("#play-text").hide();
-                        $("#audio").show();
-                        playByUrl();
+                        if(trackPlaying === activeTrack) {
+                            if(document.getElementById("sound").paused) {
+                                document.getElementById("sound").play();
+                                $("#play-text").hide();
+                                $("#audio").show();
+                            } else {
+                                document.getElementById("sound").pause();
+                                $("#play-text").show();
+                                $("#audio").hide();
+                            }
+                        } else {
+                            allowPlaylist = true;
+                            $("#play-text").hide();
+                            $("#audio").show();
+                            playByUrl();
+                        }
                     } else {
                         if(firstClick) {
                             updateTrack();
