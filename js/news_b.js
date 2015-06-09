@@ -25264,9 +25264,6 @@ var req = http.get(options, function(res) {
     for(var x = 0; x < 15; x++) {
       newsTitles.push(_$(_$('item')[x]).find('title').text());
     }
-
-    scroller(0);
-
   });
 });
 

@@ -125,7 +125,9 @@
             $(document).ready(function() {   
                 
                 var audio = $("audio");
-                                
+                
+                scroller(0);
+                
                 $(".nav-item").click(function() {
                     var me = $(this);
                     if(!me.hasClass("no-flash")) {
