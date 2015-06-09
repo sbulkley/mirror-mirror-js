@@ -306,7 +306,7 @@
                                     $("#fav50").animateCSS('slideInRight', {duration: 400});
                                     isTop50 = false;
                                     updateTrack();
-                                    setUpTrack();
+                                    trackPlaying = -1;
                                 }});
                             } else {
                                 $("#fav-text").hide();
@@ -316,7 +316,7 @@
                                     $("#top50").animateCSS('slideInRight', {duration: 400});
                                     isTop50 = true;
                                     updateTrack();
-                                    setUpTrack();
+                                    trackPlaying = -1;
                                 }});
                             }
                         }
