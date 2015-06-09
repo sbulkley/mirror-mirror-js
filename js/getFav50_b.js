@@ -23313,7 +23313,7 @@ function getUrlById(id) {
                 type: 'GET',
                 success: function(data) {
                     //console.log(id + ": " + data.url);
-                    pop50[id].url = data.url; 
+                    fav50[id].url = data.url; 
                 }
             });
         }
@@ -23321,16 +23321,16 @@ function getUrlById(id) {
 }
 
 function getTracksAndIds() {
-    var hypeURL = "https://api.hypem.com/v2/popular?mode=now&page=1&count=50&key=swagger";
+    var hypeURL = "https://api.hypem.com/v2/users/samsamsamsam/favorites?count=50&key=swagger";
     $.ajax({
         url: hypeURL,
         dataType: 'json',
         success: function(data) {
             for(item in data) {
                 var curr = data[item];
-                pop50[curr.itemid] = {"track": curr.title, "artist": curr.artist};
-                pop50ids[item] = curr.itemid;
-                $('#top50tracks').append(
+                fav50[curr.itemid] = {"track": curr.title, "artist": curr.artist};
+                fav50ids[item] = curr.itemid;
+                $('#fav50tracks').append(
                     $('<li>').append(
                         $('<span>').attr('class','track').append(" " + curr.title + " by " + curr.artist + " - " + (parseInt(item) + 1))
                     )

@@ -17,11 +17,13 @@
             <div class="nav-item" id="nav-traffic">TRAFFIC</div>
             <div class="nav-item" id="nav-news">NEWS</div>
             <div class="nav-item" id="nav-music">MUSIC</div>
-            <div class="nav-item right" id="nav-stop">STOP</div>
-            <div class="nav-item right" id="nav-play">
+            <div class="nav-item right" id="nav-list">
+                <span id="top-text">TOP50</span>
+                <span id="fav-text">FAV50</span>
+            </div>
+            <div class="nav-item right no-flash" id="nav-play">
                 <span id="play-text">PLAY</span>
                 <img id="audio" src="img/sound.gif">
-                <img id="loading" src="img/loading.gif">
             </div>
             <div class="nav-item right" id="nav-up">UP</div>
             <div class="nav-item right" id="nav-down">DOWN</div>
@@ -32,8 +34,11 @@
         <div id="forecast-container">
             <ul id="forecast"></ul>
         </div>
-        <div id="tracks-container">
-            <ul id="tracks"></ul>
+        <div class="tracks-container" id="top50">
+            <ul class="tracks" id="top50tracks"></ul>
+        </div>
+        <div class="tracks-container" id="fav50">
+            <ul class="tracks" id="fav50tracks"></ul>
         </div>
         <div id="clock"></div>
         <div id="news"></div>
@@ -43,8 +48,9 @@
         <script>
             var weather = [];
             var pop50ids = [];
-            var hasTrack = [];
             var pop50 = {};
+            var fav50ids = [];
+            var fav50 = {};
             var newsTitles = [];
         </script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -53,6 +59,7 @@
         <script src="js/news_b.js"></script>
         <script src="js/clock.js"></script>
         <script src="js/getTop50_b.js"></script>
+        <script src="js/getFav50_b.js"></script>
         <script>
             var mapShown = false;
             var weatherShown = true;
@@ -61,21 +68,38 @@
             var activeTrack = 0;
             var trackPlaying = -1;
             var firstClick = true;
-            var allowPlaylist = false;
+            var isTop50 = true;
             
             function updateTrack() {
                 var all = $(".track");
-                for(var x = 0; x < 50; x++) {
+                for(var x = 0; x < all.length; x++) {
                     $($(all[x])).css('border', 'none');
                 }
-                $($("#tracks").children()[activeTrack]).children().css('border', '1px solid #fff');
+                if(isTop50) {
+                    $($("#top50tracks").children()[activeTrack]).children().css('border', '1px solid #fff');
+                } else {
+                    $($("#fav50tracks").children()[activeTrack]).children().css('border', '1px solid #fff');
+                }
             }
             
             function playByUrl() {
-                //console.log(pop50ids[activeTrack]);
                 trackPlaying = activeTrack;
-                $("#sound").attr("src", pop50[pop50ids[activeTrack]].url);
+                if(isTop50) {
+                    $("#sound").attr("src", pop50[pop50ids[activeTrack]].url);
+                } else {
+                    $("#sound").attr("src", fav50[fav50ids[activeTrack]].url);
+                }
                 document.getElementById("sound").play();
+            }
+            
+            function setUpTrack() {
+                $("#play-text").show();
+                $("#audio").hide();
+                if(isTop50) {
+                    $("#sound").attr("src", pop50[pop50ids[activeTrack]].url);
+                } else {
+                    $("#sound").attr("src", fav50[fav50ids[activeTrack]].url);
+                }
             }
             
             function scroller(i) {
@@ -104,12 +128,12 @@
                 
                 $(".nav-item").click(function() {
                     var me = $(this);
-                    me.css("background-color", "#fff");
-                    console.log(me);
-                     setTimeout(function() {
-                         console.log(me);
-                        me.css("background-color", "rgba(0,0,0,0)");
-                    }, 100, me);
+                    if(!me.hasClass("no-flash")) {
+                        me.css("background-color", "#fff");
+                         setTimeout(function() {
+                            me.css("background-color", "rgba(0,0,0,0)");
+                        }, 100, me);
+                    }
                 });
                 
                 $("#nav-traffic").click(function() {
@@ -144,16 +168,22 @@
                 
                 $("#nav-music").click(function() {
                     if(firstClick) {
+                        console.log("First!");
                         updateTrack();
                         firstClick = false;
                     }
+                    if(isTop50) {
+                        var tmp = $("#top50");
+                    } else {
+                        var tmp = $("#fav50");
+                    }
                     if(musicShown === false) {
-                        $("#tracks-container").animateCSS('slideInRight', function() {
+                        tmp.animateCSS('slideInRight', function() {
                             musicShown = true;
                         });
                     } else {
-                        $("#tracks-container").animateCSS('slideOutRight', function() {
-                            $("#tracks-container").hide();
+                        tmp.animateCSS('slideOutRight', function() {
+                            tmp.hide();
                             musicShown = false;
                         });
                     }
@@ -204,7 +234,6 @@
                                 $("#audio").hide();
                             }
                         } else {
-                            allowPlaylist = true;
                             $("#play-text").hide();
                             $("#audio").show();
                             playByUrl();
@@ -214,9 +243,15 @@
                             updateTrack();
                             firstClick = false;
                         }
-                        $("#tracks-container").animateCSS('slideInRight', function() {
-                            musicShown = true;
-                        });
+                        if(isTop50) {
+                            $("#top50").animateCSS('slideInRight', function() {
+                                musicShown = true;
+                            });
+                        } else {
+                            $("#fav50").animateCSS('slideInRight', function() {
+                                musicShown = true;
+                            });
+                        }
                     }
                         
                 });
@@ -234,11 +269,58 @@
                     }
                 });
                 
-                $("#nav-stop").click(function() {
-                    allowPlaylist = false;
-                    document.getElementById("sound").pause();
-                    $("#audio").hide();
-                    $("#play-text").show();
+                $("#nav-list").click(function() {
+                    if(firstClick) {
+                        firstClick = false;
+                        $("#top-text").hide();
+                        $("#fav-text").show();
+                        $("#fav50").animateCSS('slideInRight', {duration: 400});
+                        isTop50 = false;
+                        updateTrack();
+                        setUpTrack();
+                        musicShown = true;
+                    } else {
+                        if(!musicShown) {
+                            musicShown = true;
+                            if(isTop50) {
+                                $("#top-text").hide();
+                                $("#fav-text").show();
+                                $("#fav50").animateCSS('slideInRight', {duration: 400});
+                                isTop50 = false;
+                                updateTrack();
+                                setUpTrack();
+                            } else {
+                                $("#fav-text").hide();
+                                $("#top-text").show();
+                                $("#top50").animateCSS('slideInRight', {duration: 400});
+                                isTop50 = true;
+                                updateTrack();
+                                setUpTrack();
+                            }
+                        } else {
+                            if(isTop50) {
+                                $("#top-text").hide();
+                                $("#fav-text").show();
+                                $("#top50").animateCSS('slideOutRight', {duration: 400, callback: function() {
+                                    $("#top50").hide();
+                                    $("#fav50").animateCSS('slideInRight', {duration: 400});
+                                    isTop50 = false;
+                                    updateTrack();
+                                    setUpTrack();
+                                }});
+                            } else {
+                                $("#fav-text").hide();
+                                $("#top-text").show();
+                                $("#fav50").animateCSS('slideOutRight', {duration: 400, callback: function() {
+                                    $("#fav50").hide();
+                                    $("#top50").animateCSS('slideInRight', {duration: 400});
+                                    isTop50 = true;
+                                    updateTrack();
+                                    setUpTrack();
+                                }});
+                            }
+                        }
+                    }
                 });
             });
                 
