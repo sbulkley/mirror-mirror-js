@@ -25,3 +25,7 @@ while True:
   elif msg == 6:
     call(["xdotool", "mousemove", "630", "50"])
     call(["xdotool", "click", "1"])
+  elif msg == 7:
+    call(["xdotool", "mousemove", "700", "50"])
+    call(["xdotool", "click", "1"])
+
