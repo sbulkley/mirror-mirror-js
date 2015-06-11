@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="css/styles.css">
         <link rel="stylesheet" href="css/icons/icons.css">
         <link rel="stylesheet" href="css/animate.css">
-        <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700|Pacifico' rel='stylesheet' type='text/css'>
     </head>
     <body>
         <div id="nav">
@@ -45,6 +45,9 @@
         <div id="map-container">
             <iframe id="map" src="https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d86050.15024094965!2d-122.42150085557832!3d47.624825074543054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e6!4m5!1s0x5490169429d20749%3A0x9f7fe4b733ac165!2s10326+15th+Ave+NW%2C+Seattle%2C+WA+98177!3m2!1d47.704361!2d-122.376086!4m5!1s0x54904195b6e5e62f%3A0xc742843a7702fe79!2sPacific+Market+Center%2C+4th+Avenue+South%2C+Seattle%2C+WA!3m2!1d47.547139!2d-122.32909!5e0!3m2!1sen!2sus!4v1433222675421"></iframe>
         </div>
+        <div id="logo-container">
+            <div id="logo">Mirror<br>Mirror</div>
+        </div>
         <script>
             var weather = [];
             var pop50ids = [];
@@ -69,6 +72,7 @@
             var trackPlaying = -1;
             var firstClick = true;
             var isTop50 = true;
+            var splashScreen = true;
             
             function updateTrack() {
                 var all = $(".track");
@@ -318,6 +322,10 @@
                             }
                         }
                     }
+                });
+                
+                $("#logo-container").click(function() {
+                    $(this).fadeOut('slow');
                 });
             });
                 
